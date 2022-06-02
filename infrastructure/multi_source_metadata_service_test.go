@@ -80,13 +80,13 @@ func describeMultiSourceMetadataService() { //nolint:funlen
 			})
 		})
 
-		Describe("GetRegistryEndpoint", func() {
-			It("returns registry endpoint from the available service", func() {
-				registryEndpoint, err := metadataService.GetRegistryEndpoint()
-				Expect(err).NotTo(HaveOccurred())
-				Expect(registryEndpoint).To(Equal("fake-registry-endpoint-1"))
-			})
-		})
+		//	Describe("GetRegistryEndpoint", func() {
+		//		It("returns registry endpoint from the available service", func() {
+		//			registryEndpoint, err := metadataService.GetRegistryEndpoint()
+		//			Expect(err).NotTo(HaveOccurred())
+		//			Expect(registryEndpoint).To(Equal("fake-registry-endpoint-1"))
+		//		})
+		//	})
 
 		Describe("GetSettings", func() {
 			Context("selected metadata service did not return an error", func() {
@@ -157,13 +157,13 @@ func describeMultiSourceMetadataService() { //nolint:funlen
 			})
 		})
 
-		Describe("GetRegistryEndpoint", func() {
-			It("returns registry endpoint from the available service", func() {
-				registryEndpoint, err := metadataService.GetRegistryEndpoint()
-				Expect(err).NotTo(HaveOccurred())
-				Expect(registryEndpoint).To(Equal("fake-registry-endpoint-2"))
-			})
-		})
+		//	Describe("GetRegistryEndpoint", func() {
+		//		It("returns registry endpoint from the available service", func() {
+		//			registryEndpoint, err := metadataService.GetRegistryEndpoint()
+		//			Expect(err).NotTo(HaveOccurred())
+		//			Expect(registryEndpoint).To(Equal("fake-registry-endpoint-2"))
+		//		})
+		//	})
 
 		Describe("GetNetworks", func() {
 			It("returns network settings from the available service", func() {
@@ -210,13 +210,13 @@ func describeMultiSourceMetadataService() { //nolint:funlen
 			})
 		})
 
-		Describe("GetRegistryEndpoint", func() {
-			It("returns an error getting the registry endpoint", func() {
-				_, err := metadataService.GetRegistryEndpoint()
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("services not available"))
-			})
-		})
+		//	Describe("GetRegistryEndpoint", func() {
+		//		It("returns an error getting the registry endpoint", func() {
+		//			_, err := metadataService.GetRegistryEndpoint()
+		//			Expect(err).To(HaveOccurred())
+		//			Expect(err.Error()).To(Equal("services not available"))
+		//		})
+		//	})
 
 		Describe("GetNetworks", func() {
 			It("returns an error getting the networks", func() {

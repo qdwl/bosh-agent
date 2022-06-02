@@ -19,7 +19,6 @@ var _ = Describe("RegistryProvider", func() {
 	var (
 		metadataService  *fakeinf.FakeMetadataService
 		platform         *platformfakes.FakePlatform
-		useServerName    bool
 		fs               *fakesys.FakeFileSystem
 		registryProvider RegistryProvider
 		logger           boshlog.Logger
@@ -28,13 +27,12 @@ var _ = Describe("RegistryProvider", func() {
 	BeforeEach(func() {
 		metadataService = &fakeinf.FakeMetadataService{}
 		platform = &platformfakes.FakePlatform{}
-		useServerName = false
 		fs = fakesys.NewFakeFileSystem()
 	})
 
 	JustBeforeEach(func() {
 		logger = boshlog.NewLogger(boshlog.LevelNone)
-		registryProvider = NewRegistryProvider(metadataService, platform, useServerName, fs, logger)
+		registryProvider = NewRegistryProvider(metadataService, platform, fs, logger)
 	})
 
 	Describe("GetRegistry", func() {
@@ -44,7 +42,6 @@ var _ = Describe("RegistryProvider", func() {
 			})
 
 			Context("when registry is configured to not use server name as id", func() {
-				BeforeEach(func() { useServerName = false })
 
 				It("returns an http registry that does not use server name as id", func() {
 					registry, err := registryProvider.GetRegistry()
@@ -54,7 +51,6 @@ var _ = Describe("RegistryProvider", func() {
 			})
 
 			Context("when registry is configured to use server name as id", func() {
-				BeforeEach(func() { useServerName = true })
 
 				It("returns an http registry that uses server name as id", func() {
 					registry, err := registryProvider.GetRegistry()

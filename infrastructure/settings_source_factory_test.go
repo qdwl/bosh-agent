@@ -31,123 +31,104 @@ var _ = Describe("SettingsSourceFactory", func() {
 			factory = NewSettingsSourceFactory(options, platform, logger)
 		})
 
-		Context("when UseRegistry is set to true", func() {
-			BeforeEach(func() {
-				options.UseRegistry = true
+		Context("when using config sources", func() {
+
+			Context("when using HTTP source", func() {
+				BeforeEach(func() {
+					options.Sources = []SourceOptions{
+						HTTPSourceOptions{URI: "http://fake-url"},
+					}
+				})
+
+				It("returns a settings source that uses HTTP to fetch settings", func() {
+					settingsSource, err := factory.New()
+					Expect(err).ToNot(HaveOccurred())
+
+					metadataService := settingsSource.(ComplexSettingsSource).GetMetadataService()
+					httpMetadataService := metadataService.(*MultiSourceMetadataService).Services[0]
+
+					Expect(reflect.TypeOf(httpMetadataService).Name()).To(Equal(reflect.TypeOf(HTTPMetadataService{}).Name()))
+				})
 			})
 
-			ItConfiguresSourcesToUseRegistry := func(useServerName bool) {
-				Context("when using HTTP source", func() {
-					BeforeEach(func() {
-						options.Sources = []SourceOptions{
-							HTTPSourceOptions{URI: "http://fake-url"},
-						}
-					})
+			Context("when using ConfigDrive source", func() {
+				BeforeEach(func() {
+					options.Sources = []SourceOptions{
+						ConfigDriveSourceOptions{
+							DiskPaths: []string{"/fake-disk-path"},
 
-					It("returns a settings source that uses HTTP to fetch settings", func() {
-						settingsSource, err := factory.New()
-						Expect(err).ToNot(HaveOccurred())
+							MetaDataPath: "fake-meta-data-path",
+							UserDataPath: "fake-user-data-path",
 
-						metadataService := settingsSource.(ComplexSettingsSource).GetMetadataService()
-						httpMetadataService := metadataService.(*MultiSourceMetadataService).Services[0]
-
-						Expect(reflect.TypeOf(httpMetadataService).Name()).To(Equal(reflect.TypeOf(HTTPMetadataService{}).Name()))
-					})
+							SettingsPath: "fake-settings-path",
+						},
+					}
 				})
 
-				Context("when using ConfigDrive source", func() {
-					BeforeEach(func() {
-						options.Sources = []SourceOptions{
-							ConfigDriveSourceOptions{
-								DiskPaths: []string{"/fake-disk-path"},
+				It("returns a settings source that uses config drive to fetch settings", func() {
+					configDriveMetadataService := NewConfigDriveMetadataService(
+						platform,
+						[]string{"/fake-disk-path"},
+						"fake-meta-data-path",
+						"fake-user-data-path",
+						logger,
+					)
+					multiSourceMetadataService := NewMultiSourceMetadataService(configDriveMetadataService)
+					registryProvider := NewRegistryProvider(multiSourceMetadataService, platform, platform.GetFs(), logger)
+					configDriveSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, registryProvider, logger)
 
-								MetaDataPath: "fake-meta-data-path",
-								UserDataPath: "fake-user-data-path",
-
-								SettingsPath: "fake-settings-path",
-							},
-						}
-					})
-
-					It("returns a settings source that uses config drive to fetch settings", func() {
-						resolver := NewRegistryEndpointResolver(NewDigDNSResolver(platform.GetRunner(), logger))
-						configDriveMetadataService := NewConfigDriveMetadataService(
-							resolver,
-							platform,
-							[]string{"/fake-disk-path"},
-							"fake-meta-data-path",
-							"fake-user-data-path",
-							logger,
-						)
-						multiSourceMetadataService := NewMultiSourceMetadataService(configDriveMetadataService)
-						registryProvider := NewRegistryProvider(multiSourceMetadataService, platform, useServerName, platform.GetFs(), logger)
-						configDriveSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, registryProvider, logger)
-
-						settingsSource, err := factory.New()
-						Expect(err).ToNot(HaveOccurred())
-						Expect(settingsSource).To(Equal(configDriveSettingsSource))
-					})
+					settingsSource, err := factory.New()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(settingsSource).To(Equal(configDriveSettingsSource))
 				})
-
-				Context("when using File source", func() {
-					BeforeEach(func() {
-						options.Sources = []SourceOptions{
-							FileSourceOptions{
-								MetaDataPath: "fake-meta-data-path",
-								UserDataPath: "fake-user-data-path",
-
-								SettingsPath: "fake-settings-path",
-							},
-						}
-					})
-
-					It("returns a settings source that uses file to fetch settings", func() {
-						fileMetadataService := NewFileMetadataService(
-							"fake-meta-data-path",
-							"fake-user-data-path",
-							"fake-settings-path",
-							platform.GetFs(),
-							logger,
-						)
-						multiSourceMetadataService := NewMultiSourceMetadataService(fileMetadataService)
-						registryProvider := NewRegistryProvider(multiSourceMetadataService, platform, useServerName, platform.GetFs(), logger)
-						fileSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, registryProvider, logger)
-
-						settingsSource, err := factory.New()
-						Expect(err).ToNot(HaveOccurred())
-						Expect(settingsSource).To(Equal(fileSettingsSource))
-					})
-				})
-
-				Context("when using CDROM source", func() {
-					BeforeEach(func() {
-						options.Sources = []SourceOptions{
-							CDROMSourceOptions{
-								FileName: "fake-file-name",
-							},
-						}
-					})
-
-					It("returns error because it is not supported", func() {
-						_, err := factory.New()
-						Expect(err).To(HaveOccurred())
-						Expect(err.Error()).To(ContainSubstring("CDROM source is not supported when registry is used"))
-					})
-				})
-			}
-
-			Context("when UseServerName is set to true", func() {
-				BeforeEach(func() { options.UseServerName = true })
-				ItConfiguresSourcesToUseRegistry(true)
 			})
 
-			Context("when UseServerName is set to false", func() {
-				BeforeEach(func() { options.UseServerName = false })
-				ItConfiguresSourcesToUseRegistry(false)
-			})
-		})
+			Context("when using File source", func() {
+				BeforeEach(func() {
+					options.Sources = []SourceOptions{
+						FileSourceOptions{
+							MetaDataPath: "fake-meta-data-path",
+							UserDataPath: "fake-user-data-path",
 
-		Context("when UseRegistry is set to false", func() {
+							SettingsPath: "fake-settings-path",
+						},
+					}
+				})
+
+				It("returns a settings source that uses file to fetch settings", func() {
+					fileMetadataService := NewFileMetadataService(
+						"fake-meta-data-path",
+						"fake-user-data-path",
+						"fake-settings-path",
+						platform.GetFs(),
+						logger,
+					)
+					multiSourceMetadataService := NewMultiSourceMetadataService(fileMetadataService)
+					registryProvider := NewRegistryProvider(multiSourceMetadataService, platform, platform.GetFs(), logger)
+					fileSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, registryProvider, logger)
+
+					settingsSource, err := factory.New()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(settingsSource).To(Equal(fileSettingsSource))
+				})
+			})
+
+			Context("when using CDROM source", func() {
+				BeforeEach(func() {
+					options.Sources = []SourceOptions{
+						CDROMSourceOptions{
+							FileName: "fake-file-name",
+						},
+					}
+				})
+
+				It("returns error because it is not supported", func() {
+					_, err := factory.New()
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(ContainSubstring("CDROM source is not supported when registry is used"))
+				})
+			})
+
 			Context("when using HTTP source", func() {
 				BeforeEach(func() {
 					options = SettingsOptions{
