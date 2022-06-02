@@ -192,14 +192,6 @@ func describeMultiSourceMetadataService() { //nolint:funlen
 			})
 		})
 
-		//	Describe("GetRegistryEndpoint", func() {
-		//		It("returns an error getting the registry endpoint", func() {
-		//			_, err := metadataService.GetRegistryEndpoint()
-		//			Expect(err).To(HaveOccurred())
-		//			Expect(err.Error()).To(Equal("services not available"))
-		//		})
-		//	})
-
 		Describe("GetNetworks", func() {
 			It("returns an error getting the networks", func() {
 				_, err := metadataService.GetNetworks()

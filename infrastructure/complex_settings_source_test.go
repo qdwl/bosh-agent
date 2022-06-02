@@ -43,12 +43,14 @@ var _ = Describe("ComplexSettingsSource", func() {
 	})
 
 	Describe("Settings", func() {
-		It("returns settings read from the registry", func() {
+		It("returns settings from the metadataService", func() {
 			metadataService = &fakeinf.FakeMetadataService{
 				Settings: boshsettings.Settings{
 					AgentID: "fake-agent-id",
 				},
 			}
+			logger := boshlog.NewLogger(boshlog.LevelNone)
+			source = NewComplexSettingsSource(metadataService, logger)
 
 			settings, err := source.Settings()
 			Expect(err).ToNot(HaveOccurred())
@@ -59,6 +61,8 @@ var _ = Describe("ComplexSettingsSource", func() {
 			metadataService = &fakeinf.FakeMetadataService{
 				SettingsErr: errors.New("fake-get-settings-error"),
 			}
+			logger := boshlog.NewLogger(boshlog.LevelNone)
+			source = NewComplexSettingsSource(metadataService, logger)
 
 			_, err := source.Settings()
 			Expect(err).To(HaveOccurred())

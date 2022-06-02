@@ -4,10 +4,9 @@ import (
 	"reflect"
 
 	. "github.com/cloudfoundry/bosh-agent/infrastructure"
+	"github.com/cloudfoundry/bosh-agent/platform/platformfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"github.com/cloudfoundry/bosh-agent/platform/platformfakes"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 )
@@ -64,22 +63,22 @@ var _ = Describe("SettingsSourceFactory", func() {
 						},
 					}
 				})
+				// was only used when registry is set to true
+				//			It("returns a settings source that uses config drive to fetch settings", func() {
+				//				configDriveMetadataService := NewConfigDriveMetadataService(
+				//					platform,
+				//					[]string{"/fake-disk-path"},
+				//					"fake-meta-data-path",
+				//					"fake-user-data-path",
+				//					logger,
+				//				)
+				//				multiSourceMetadataService := NewMultiSourceMetadataService(configDriveMetadataService)
+				//				configDriveSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, logger)
 
-				It("returns a settings source that uses config drive to fetch settings", func() {
-					configDriveMetadataService := NewConfigDriveMetadataService(
-						platform,
-						[]string{"/fake-disk-path"},
-						"fake-meta-data-path",
-						"fake-user-data-path",
-						logger,
-					)
-					multiSourceMetadataService := NewMultiSourceMetadataService(configDriveMetadataService)
-					configDriveSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, logger)
-
-					settingsSource, err := factory.New()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(settingsSource).To(Equal(configDriveSettingsSource))
-				})
+				//				settingsSource, err := factory.New()
+				//				Expect(err).ToNot(HaveOccurred())
+				//				Expect(settingsSource).To(Equal(configDriveSettingsSource))
+				//			})
 			})
 
 			Context("when using File source", func() {
@@ -94,53 +93,22 @@ var _ = Describe("SettingsSourceFactory", func() {
 					}
 				})
 
-				It("returns a settings source that uses file to fetch settings", func() {
-					fileMetadataService := NewFileMetadataService(
-						"fake-meta-data-path",
-						"fake-user-data-path",
-						"fake-settings-path",
-						platform.GetFs(),
-						logger,
-					)
-					multiSourceMetadataService := NewMultiSourceMetadataService(fileMetadataService)
-					fileSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, logger)
+				// was only used when registry is set to true
+				//			It("returns a settings source that uses file to fetch settings", func() {
+				//				fileMetadataService := NewFileMetadataService(
+				//					"fake-meta-data-path",
+				//					"fake-user-data-path",
+				//					"fake-settings-path",
+				//					platform.GetFs(),
+				//					logger,
+				//				)
+				//				multiSourceMetadataService := NewMultiSourceMetadataService(fileMetadataService)
+				//				fileSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, logger)
 
-					settingsSource, err := factory.New()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(settingsSource).To(Equal(fileSettingsSource))
-				})
-			})
-
-			Context("when using CDROM source", func() {
-				BeforeEach(func() {
-					options.Sources = []SourceOptions{
-						CDROMSourceOptions{
-							FileName: "fake-file-name",
-						},
-					}
-				})
-
-				It("returns error because it is not supported", func() {
-					_, err := factory.New()
-					Expect(err).To(HaveOccurred())
-					Expect(err.Error()).To(ContainSubstring("CDROM source is not supported when registry is used"))
-				})
-			})
-
-			Context("when using HTTP source", func() {
-				BeforeEach(func() {
-					options = SettingsOptions{
-						Sources: []SourceOptions{
-							HTTPSourceOptions{},
-						},
-					}
-				})
-
-				It("returns error because it is not supported", func() {
-					_, err := factory.New()
-					Expect(err).To(HaveOccurred())
-					Expect(err.Error()).To(ContainSubstring("HTTP source is not supported without registry"))
-				})
+				//				settingsSource, err := factory.New()
+				//				Expect(err).ToNot(HaveOccurred())
+				//				Expect(settingsSource).To(Equal(fileSettingsSource))
+				//			})
 			})
 
 			Context("when using ConfigDrive source", func() {
@@ -148,17 +116,16 @@ var _ = Describe("SettingsSourceFactory", func() {
 					options = SettingsOptions{
 						Sources: []SourceOptions{
 							ConfigDriveSourceOptions{
-								DiskPaths: []string{"/fake-disk-path"},
-
+								DiskPaths:    []string{"/fake-disk-path"},
 								MetaDataPath: "fake-meta-data-path",
-
 								SettingsPath: "fake-settings-path",
 							},
 						},
 					}
 				})
 
-				It("returns a settings source that uses config drive to fetch settings", func() {
+				FIt("returns a settings source that uses config drive to fetch settings", func() {
+
 					configDriveSettingsSource := NewConfigDriveSettingsSource(
 						[]string{"/fake-disk-path"},
 						"fake-meta-data-path",
@@ -169,8 +136,8 @@ var _ = Describe("SettingsSourceFactory", func() {
 
 					multiSettingsSource, err := NewMultiSettingsSource(configDriveSettingsSource)
 					Expect(err).ToNot(HaveOccurred())
-
 					settingsSource, err := factory.New()
+
 					Expect(err).ToNot(HaveOccurred())
 					Expect(settingsSource).To(Equal(multiSettingsSource))
 				})
