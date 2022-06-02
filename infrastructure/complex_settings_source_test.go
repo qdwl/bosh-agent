@@ -14,16 +14,14 @@ import (
 
 var _ = Describe("ComplexSettingsSource", func() {
 	var (
-		metadataService  *fakeinf.FakeMetadataService
-		registryProvider *fakeinf.FakeRegistryProvider
-		source           ComplexSettingsSource
+		metadataService *fakeinf.FakeMetadataService
+		source          ComplexSettingsSource
 	)
 
 	BeforeEach(func() {
 		metadataService = &fakeinf.FakeMetadataService{}
-		registryProvider = &fakeinf.FakeRegistryProvider{}
 		logger := boshlog.NewLogger(boshlog.LevelNone)
-		source = NewComplexSettingsSource(metadataService, registryProvider, logger)
+		source = NewComplexSettingsSource(metadataService, logger)
 	})
 
 	Describe("PublicSSHKeyForUsername", func() {
@@ -46,7 +44,7 @@ var _ = Describe("ComplexSettingsSource", func() {
 
 	Describe("Settings", func() {
 		It("returns settings read from the registry", func() {
-			registryProvider.GetRegistryRegistry = &fakeinf.FakeRegistry{
+			metadataService = &fakeinf.FakeMetadataService{
 				Settings: boshsettings.Settings{
 					AgentID: "fake-agent-id",
 				},
@@ -57,17 +55,9 @@ var _ = Describe("ComplexSettingsSource", func() {
 			Expect(settings.AgentID).To(Equal("fake-agent-id"))
 		})
 
-		It("returns an error if cannot get registry", func() {
-			registryProvider.GetRegistryErr = errors.New("fake-get-registry-error")
-
-			_, err := source.Settings()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("fake-get-registry-error"))
-		})
-
-		It("returns an error if registry returns an error while getting settings", func() {
-			registryProvider.GetRegistryRegistry = &fakeinf.FakeRegistry{
-				GetSettingsErr: errors.New("fake-get-settings-error"),
+		It("returns an error if getting settings fails", func() {
+			metadataService = &fakeinf.FakeMetadataService{
+				SettingsErr: errors.New("fake-get-settings-error"),
 			}
 
 			_, err := source.Settings()

@@ -74,8 +74,7 @@ var _ = Describe("SettingsSourceFactory", func() {
 						logger,
 					)
 					multiSourceMetadataService := NewMultiSourceMetadataService(configDriveMetadataService)
-					registryProvider := NewRegistryProvider(multiSourceMetadataService, platform, platform.GetFs(), logger)
-					configDriveSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, registryProvider, logger)
+					configDriveSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, logger)
 
 					settingsSource, err := factory.New()
 					Expect(err).ToNot(HaveOccurred())
@@ -104,8 +103,7 @@ var _ = Describe("SettingsSourceFactory", func() {
 						logger,
 					)
 					multiSourceMetadataService := NewMultiSourceMetadataService(fileMetadataService)
-					registryProvider := NewRegistryProvider(multiSourceMetadataService, platform, platform.GetFs(), logger)
-					fileSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, registryProvider, logger)
+					fileSettingsSource := NewComplexSettingsSource(multiSourceMetadataService, logger)
 
 					settingsSource, err := factory.New()
 					Expect(err).ToNot(HaveOccurred())
