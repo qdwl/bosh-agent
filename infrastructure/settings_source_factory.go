@@ -212,7 +212,7 @@ func (f SettingsSourceFactory) buildWithoutRegistry() (boshsettings.Source, erro
 		metadataService := NewMultiSourceMetadataService(metadataServices...)
 		registryProvider := NewRegistryProvider(metadataService, f.platform, f.platform.GetFs(), f.logger)
 		settingsSource := NewComplexSettingsSource(metadataService, registryProvider, f.logger)
-		settingsSources = append(settingsSources, settingsSource)
+		return NewMultiSettingsSource(settingsSource)
 	}
 
 	return NewMultiSettingsSource(settingsSources...)
