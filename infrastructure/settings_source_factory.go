@@ -172,14 +172,13 @@ func (f SettingsSourceFactory) buildWithoutRegistry() (boshsettings.Source, erro
 			metadataSource = true
 
 		case ConfigDriveSourceOptions:
-			metadataService = NewConfigDriveMetadataService(
-				f.platform,
+			settingsSource = NewConfigDriveSettingsSource(
 				typedOpts.DiskPaths,
 				typedOpts.MetaDataPath,
 				typedOpts.UserDataPath,
+				f.platform,
 				f.logger,
 			)
-			metadataSource = true
 
 		case FileSourceOptions:
 			settingsSource = NewFileSettingsSource(

@@ -44,7 +44,7 @@ var _ = Describe("SettingsSourceFactory", func() {
 					settingsSource, err := factory.New()
 					Expect(err).ToNot(HaveOccurred())
 
-					metadataService := settingsSource.(ComplexSettingsSource).GetMetadataService()
+					metadataService := settingsSource.(*MultiSettingsSource).GetMetadataService()
 					httpMetadataService := metadataService.(*MultiSourceMetadataService).Services[0]
 
 					Expect(reflect.TypeOf(httpMetadataService).Name()).To(Equal(reflect.TypeOf(HTTPMetadataService{}).Name()))

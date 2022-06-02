@@ -36,29 +36,6 @@ var _ = Describe("RegistryProvider", func() {
 	})
 
 	Describe("GetRegistry", func() {
-		Context("when metadata service returns registry http endpoint", func() {
-			BeforeEach(func() {
-				metadataService.RegistryEndpoint = "http://registry-endpoint"
-			})
-
-			Context("when registry is configured to not use server name as id", func() {
-
-				It("returns an http registry that does not use server name as id", func() {
-					registry, err := registryProvider.GetRegistry()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(registry).To(Equal(NewHTTPRegistry(metadataService, platform, false, logger)))
-				})
-			})
-
-			Context("when registry is configured to use server name as id", func() {
-
-				It("returns an http registry that uses server name as id", func() {
-					registry, err := registryProvider.GetRegistry()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(registry).To(Equal(NewHTTPRegistry(metadataService, platform, true, logger)))
-				})
-			})
-		})
 
 		Context("when metadata service returns registry file endpoint", func() {
 			BeforeEach(func() {
