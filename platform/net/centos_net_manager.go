@@ -176,12 +176,20 @@ PEERDNS=yes
 `
 
 const centosStaticIfcfgTemplate = `DEVICE={{ .Name }}
+NAME={{ .Name }}
 BOOTPROTO=static
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSWER_ONLY=no
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=no
 IPADDR={{ .Address }}
 NETMASK={{ .Netmask }}
 BROADCAST={{ .Broadcast }}{{if .IsDefaultForGateway}}
 GATEWAY={{ .Gateway }}{{end}}
 ONBOOT=yes
+UUID={{ .UUID }}
 PEERDNS=no{{ range .DNSServers }}
 DNS{{ .Index }}={{ .Address }}{{ end }}
 `

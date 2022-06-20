@@ -7,6 +7,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
+	"github.com/gofrs/uuid"
 )
 
 type VirtualInterface struct {
@@ -23,6 +24,7 @@ type StaticInterfaceConfiguration struct {
 	IsDefaultForGateway bool
 	Mac                 string
 	Gateway             string
+	UUID                string
 	PostUpRoutes        boshsettings.Routes
 	VirtualInterfaces   []VirtualInterface
 }
@@ -212,6 +214,7 @@ func (creator interfaceConfigurationCreator) createInterfaceConfiguration(static
 			Mac:                 networkSettings.Mac,
 			Gateway:             networkSettings.Gateway,
 			PostUpRoutes:        networkSettings.Routes,
+			UUID:                uuid.Must(uuid.NewV4()).String(),
 		})
 	}
 	return staticConfigs, dhcpConfigs, nil
